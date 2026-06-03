@@ -1,4 +1,4 @@
-# Azure RedOps
+# AzureRedOps
 
 > A Swiss Army tool for Azure / Entra ID red teaming.
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-Azure RedOps is a offensive security toolkit for assessing the security
+AzureRedOps is a offensive security toolkit for assessing the security
 posture of **Microsoft Entra ID and Azure** tenants. It wraps the most common
 red-team workflows — authentication, token management, directory enumeration,
 privilege checking, password spraying, and post-exploitation actions against
@@ -240,7 +240,7 @@ python3 AzureRedOps.py -a refresh -l mytoken -app d3590ed6-52b3-4102-aeff-aad229
 
 #### How the authentication flows work
 
-Azure RedOps implements several distinct ways of obtaining tokens. Pick the one that
+AzureRedOps implements several distinct ways of obtaining tokens. Pick the one that
 matches your engagement; all of them honour `-s/-n` for auto-saving the result.
 
 ##### Device-code phishing (`phish-start` / `phish-capture`)
