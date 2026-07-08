@@ -1,0 +1,9 @@
+Action          : Microsoft domain set to 'microsoftonline.com'.
+Hint            : Set the scope to 'https://graph.microsoft.com/.default offline_access openid'
+Success         : AppId is set to d3590ed6-52b3-4102-aeff-aad2292ab01c.
+Success         : Tenant is set to common.
+Url             : https://microsoft.com/devicelogin
+User Code       : DTDBW4F5H
+Device Code     : DBgABIQEAAAAdDD7nC9b5Q7JPd_okEQRFRXZvU3RzQXJ0aWZhY3RzAQAAAAAAwUfOI6XKiDS-dR6ap-CvzfjON0I4EwSMsxfE5olGizSCiOfmrOegRKNnL4TftpcuACtnCQ6SAzhhrzLP2uuXwYgNyM6wKceLk9U2KTHo709EWR9b4PLnA5NFmW3ROkzrL2tzVvQnq_w0cgixYGE6UScfr6FWtiucqrHyBxyPV_mR6j36f8qjLgTexZG0bJge6vfaOdVG8BdTCmC3ElLfOSOlZWvAvp8WBgVjBPD8nDVaoFUuJGqg6DAAvb9gTtSB9HxQZQctpjBI5TjpL2Wihz6sOjJNNCiyDo7jvZNsukjCbw1RvMvclW0rqMRz8fOSfS8mnq1VrMArolvXRwVCQonj1EFpIV3FZs0ND1PGLzZcKb8RC4Wi_PtTeSiCMoMBtFH2nQu0JcTDXtczEbb13yHx_1bsb04Z0uis-JgY7vLwlBGHRDz5eCmwKwMFBhkTg0txJ5J6Gsm56K6_CZ5x8jptJgaxz9uEiJJ91QFj4y_uP7vISCYy1y_BS3-kHdOsQMfLpDM3MryXO7gqTLKoVbrO3cZJ0FnVoKcQpCalHhlkYVZ7ETrqMQvwD3RP-dknaGiZuDMD3R_CWJEH8-FzFPfCmM2AAQlsO7nEdHazJmoqf0PNlsnF6I34Kj04q64DffHTV2o7eNFv5Dl1z6oFQKrv2LHViIeIE-aF4DQHimWK8tcK4LDv9nSWrXyap49aVzdIvmJ6z4Wja9KeF_eQL4OLDjHlYN6LZvGccnb4wuwgAA
+Action          : Autostarting authentication capture.
+Action          : Fetching authentication token.

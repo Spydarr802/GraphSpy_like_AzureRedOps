@@ -1,0 +1,10 @@
+Action          : Microsoft domain set to 'microsoftonline.com'.
+Hint            : Set the scope to 'https://graph.microsoft.com/.default offline_access openid'
+Success         : AppId is set to d3590ed6-52b3-4102-aeff-aad2292ab01c.
+Success         : Tenant is set to common.
+Success         : OAuth version is set to v2.0.
+Url             : https://microsoft.com/devicelogin
+User Code       : LVPDCKNE8
+Device Code     : LBgABIQEAAAAdDD7nC9b5Q7JPd_okEQRFRXZvU3RzQXJ0aWZhY3RzAQAAAAAA5ZaOj8_eq4WvX6B98SPLd4AbXc8dyXHnqtLYM2yZFG6u9MUnmgVxNJQZr691jr47tOtXIjXDn9cKuq1q4762EnpfXm3faq9PbwlvfWbOO-oeT9FjyLf1kfX_dquj_eFsnR1RdzvgO2xlkdEcoywo_w_wM8d_8dkIxrXjxpxqqSNE4cBGj7H0tvOTxEkMjQCxjy0B-OvkLXj1w1q1Srai2vGcHSxHT7Kszx7NeZymAUD4848kwFJSpie755-fvSXJY5PLE9uv12VpYE1vjA6J941zTpdQjVxe2FQe0V3Va5fy6ZK8qKvuogugD_gngfseCrzwv7dO2Z_KuBUsCVFHDpY-Gis9rnl1nzlYs1dBRgGoY7_BxaETMExplYcPfLpPzag4xbDU2Ugqmp2QMqGQCUnhtxxkycUwigycy_Jh2itVlzRO5ADuGd6vSyLZXDR27g1v0D869YUdrsy5D5B_hGx0bZEmzhFn3Ryo9u9j3QkTzI8TUaxZ4jDTDEtjrshwQjUoMYsBReaF6FURfUCLQg78KyoQ9lEhbwDtMXQEZeAtrO6fpR5OaIf3tjCaQxANRNKcGKu7RlLLLFhp_iKPeeDieTHbxDv_aNFEy62Ws-x8j9cXEv_nm7LV5oWeH59w_Ve9mh45W2QCk31N7dz34v8apnMaaeKie3rCmBoYR76FOuhmlkKgje2mzR7CSSXm4kuaAUa-MNfBNwg-7_MzxL2_iHMvQY68s13ryRi2GjYgAA
+Action          : Autostarting authentication capture.
+Action          : Fetching authentication token.

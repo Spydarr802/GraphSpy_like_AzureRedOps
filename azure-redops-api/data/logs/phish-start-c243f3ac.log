@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:\Users\maxia\cookie-projects\GraphSpy_like_AzureRedOps\AzureRedOps.py", line 23, in <module>
+    from Webserver import WebServer
+ModuleNotFoundError: No module named 'Webserver'

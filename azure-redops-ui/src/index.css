@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; margin: 0; background: #121212; color: #fff; font-family: Inter, system-ui, sans-serif; }
+
+.glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); }
+.glass-strong { background: rgba(30,30,46,0.7); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.1); }
+
+input, textarea, select {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  color: #fff; border-radius: 10px; padding: 10px 14px; outline: none; transition: all .15s; width: 100%;
+}
+input:focus, textarea:focus, select:focus { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
+
+/* ------------------------------------------------------------------
+   Dark dropdown styling for <select> + native <option> menus.
+   Used by RunActivityModal "Activity (-a)" / Sender "Choose Template".
+   Wins over Tailwind's @layer base reset on Windows / macOS / Linux.
+   ------------------------------------------------------------------ */
+select.dark-select,
+select.dark-select:focus,
+select.dark-select:focus-visible,
+select.dark-select:-moz-focusring {
+  background-color: #0f0f19 !important;
+  color: #ffffff !important;
+  color-scheme: dark;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='12' height='8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 36px;
+}
+
+/* Open menu items (Chrome, Edge, Brave, Opera, Windows Chromium) */
+select.dark-select option,
+select.dark-select option:checked,
+select.dark-select option:hover,
+select.dark-select:focus > option {
+  background-color: #1a1a26 !important;
+  color: #ffffff !important;
+  padding: 8px 12px;
+}
+select.dark-select option:disabled { color: #555 !important; }
+
+/* Firefox renders the popup on its own background; force it dark too */
+@-moz-document url-prefix() {
+  select.dark-select {
+    background-color: #0f0f19 !important;
+    color: #ffffff !important;
+  }
+  select.dark-select > option {
+    background: #1a1a26 !important;
+    color: #fff !important;
+  }
+}
+
+/* Default fallback for any unclassed select inside the app */
+select {
+  background-color: #0f0f19;
+  color: #ffffff;
+  color-scheme: dark;
+}
+select option { background-color: #1a1a26; color: #ffffff; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #121212; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+.animate-fade-in { animation: fadeIn .3s ease-in-out; }
+.animate-slide-up { animation: slideUp .4s ease-out; }

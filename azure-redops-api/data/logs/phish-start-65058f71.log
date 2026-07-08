@@ -1,0 +1,7 @@
+Action          : Microsoft domain set to 'microsoftonline.com'.
+Hint            : Set the scope to 'https://graph.microsoft.com/.default offline_access openid'
+Success         : AppId is set to d3590ed6-52b3-4102-aeff-aad2292ab01c.
+Success         : Tenant is set to customers.
+Success         : OAuth version is set to v2.0.
+Error           : invalid_request
+Description     : AADSTS900023: Specified tenant identifier 'customers' is neither a valid DNS name, nor a valid external domain. Trace ID: 6ab47a20-76a3-4638-9b46-6c4c33ae5b00 Correlation ID: eadeeef7-1d52-4f48-8114-f9f98d8bcb57 Timestamp: 2026-07-08 10:44:45Z

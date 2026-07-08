@@ -1,0 +1,6 @@
+Action          : Microsoft domain set to 'microsoftonline.com'.
+Hint            : Set the scope to 'https://graph.microsoft.com/.default offline_access openid'
+Success         : AppId is set to d3590ed6-52b3-4102-aeff-aad2292ab01c.
+Success         : Tenant is set to customers.
+Success         : OAuth version is set to v2.0.
+Error           : HTTPSConnectionPool(host='login.microsoftonline.com', port=443): Max retries exceeded with url: /customers/oauth2/v2.0/devicecode (Caused by NameResolutionError("HTTPSConnection(host='login.microsoftonline.com', port=443): Failed to resolve 'login.microsoftonline.com' ([Errno 11001] getaddrinfo failed)"))
