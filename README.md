@@ -1,33 +1,29 @@
-# AzureRedOps
+# AzureRedOps (GraphSpy-like)
 
 > A Swiss Army tool for Azure / Entra ID red teaming.
 
-**Author:** Mr.Un1k0d3r ([TrueCyber Inc](https://truecyber.world))
-**Version:** 0.1
-**Language:** Python 3.12+
+**Author:** Mr.Un1k0d3r ([TrueCyber Inc](https://truecyber.world))  
+**Version:** 0.1  
+**Language:** Python 3.12+  
 
 ---
 
 ## Overview
 
-AzureRedOps is a offensive security toolkit for assessing the security
-posture of **Microsoft Entra ID and Azure** tenants. It wraps the most common
-red-team workflows — authentication, token management, directory enumeration,
-privilege checking, password spraying, and post-exploitation actions against
-**Microsoft Graph** — behind one consistent `--activity` driven CLI.
+AzureRedOps is an offensive security toolkit for assessing the security posture of **Microsoft Entra ID and Azure** tenants. It wraps the most common red-team workflows — authentication, token management, directory enumeration, privilege checking, password spraying, and post-exploitation actions against **Microsoft Graph** — behind one consistent `--activity` driven CLI.
 
-Every operation is selected with `-a/--activity`. Tokens obtained during
-authentication can be cached locally (`.azure_creds`) and reused by name with
-`-l/--load-access-token`, so you rarely have to paste raw JWTs.
+Every operation is selected with `-a/--activity`. Tokens obtained during authentication can be cached locally (`.azure_creds`) and reused by name with `-l/--load-access-token`, so you rarely have to paste raw JWTs.
 
 Learn more about the tool [on CYPFER blog](https://offsec.cypfer.com/blog/AzureRedOps-Azure-red-team)
 
-### Features
+---
+
+## Features
 
 - **Token management** — save, list, decode/view, and delete access/refresh tokens in a local credential store (`.azure_creds`). Any flow can persist its tokens automatically with `-s/--save` + `-n/--name`.
 - **Multiple authentication flows:**
   - **ROPC** (`auth`) — direct username/password authentication.
-  - **Device-code phishing** (`phish-start` / `phish-capture`) — abuse the OAuth device authorization grant to capture tokens issued when a target enters your user code at `microsoft.com/devicelogin`. Auto-captures by default.
+  - **Device-code phishing** (`phish-start` / `phish-capture`) — abuse the OAuth device authorization grant to capture tokens issued when a target enters your user code at `microsoft.com/devicelogin`. Supports both **OAuth v1.0** and **v2.0** flows (essential for personal accounts / `consumers` tenant).
   - **Third-party app consent** (`auth-app`) — full Authorization Code + PKCE flow against a custom application registration, served by a built-in local HTTPS listener that receives the redirect.
   - **Interactive browser capture** (`auth-interactive`) — drive a real Chromium browser with Playwright (handles MFA / Conditional Access / SSO), then harvest every token from the recorded session HAR.
   - **Refresh-token exchange** (`refresh`) — trade a refresh token for fresh access tokens.
@@ -39,13 +35,62 @@ Learn more about the tool [on CYPFER blog](https://offsec.cypfer.com/blog/AzureR
 
 ---
 
+## Roadmap & Planned Features (Microsoft Graph Scopes)
+
+We are actively expanding the tool's capabilities to interact with different Microsoft Graph API endpoints. Below are the functional categories and the specific Microsoft Entra/Graph scopes planned for implementation:
+
+### 📧 Mail & Contacts
+- **Mail.ReadWrite** / **Mail.Send**: Extract email messages, search mailboxes, send phishing lures/notifications, and manage user folders.
+- **Contacts.ReadWrite**: Download and harvest tenant and personal user contact directories.
+
+### 📅 Calendar & Tasks
+- **Calendar.ReadWrite** / **Calendars.Read** / **Calendars.Read.Shared**: Retrieve scheduled meetings, harvest calendar details, and insert appointments.
+- **Tasks.ReadWrite**: Read and modify user Planner tasks and to-do lists to gather operational context.
+
+### 💬 Microsoft Teams & Chats
+- **Chat.Create** / **Chat.ReadWrite** / **ChatMember.ReadWrite**: Read user chats, create new chat threads, and add members.
+- **Channel.Create** / **Channel.ReadBasic.All** / **ChannelSettings.ReadWrite.All**: Enumerate channel list, inspect settings, and create new channels.
+- **ChannelMessage.Read.All** / **ChannelMessage.Send**: Monitor, search, and send messages across public and private channels.
+- **ChannelMember.ReadWrite.All**: Manage channel memberships.
+- **TeamsTab.ReadWriteForChat**: Read and manage tabs inside team chats.
+- **Team.ReadBasic.All** / **TeamMember.ReadWrite.All**: Audit Teams structures and membership lists.
+
+### 📂 Files & Storage (OneDrive / SharePoint)
+- **Files.Read** / **Files.Read.All** / **Files.ReadWrite.All**: Search, retrieve, download, and write files in personal OneDrive and SharePoint sites.
+- **FileStorageContainer.Selected**: Read and write files inside designated application storage containers.
+
+### 👤 Directory, Users & Groups
+- **User.Read.All** / **User.ReadBasic.All** / **User.ReadWrite** / **Users.Read**: Enumerate complete directory user details and modify properties.
+- **Directory.Read.All** / **Directory.AccessAsUser.All**: Direct deep queries against directory objects.
+- **Group.Read.All** / **Group.ReadWrite.All**: Enumerate and write to groups/distribution lists.
+- **Organization.Read.All**: Enumerate company-wide profile information and verified domains.
+- **People.Read** / **People.Read.All**: Extract user networks and organizational structures.
+
+### 🛡️ Security, Audit & Compliance
+- **AuditLog.Create**: Write security audit logs.
+- **DataLossPreventionPolicy.Evaluate**: Read and test sensitivity of DLP policies.
+- **InformationProtectionPolicy.Read**: Read sensitivity label policy configurations.
+- **SensitiveInfoType.Detect** / **SensitiveInfoType.Read.All**: Scan for sensitive data types (PII, credentials, cards).
+- **SensitivityLabel.Evaluate**: Request classification evaluation for documents.
+- **Reports.Read.All**: Access Microsoft 365 usage and activity reports.
+- **ProtectionScopes.Compute.User**: Manage data protection configurations.
+
+### 🖨️ Printing services
+- **Printer.Read.All** / **PrinterShare.ReadBasic.All** / **PrintJob.Create** / **PrintJob.ReadWriteBasic**: Interact with Cloud Print infrastructure, list devices, and submit print jobs.
+
+---
+
 ## Requirements
 
 - Python **3.12 or newer** (the code relies on PEP 701 f-string syntax).
 - Python packages (see `requirements.txt`):
   - `PyJWT`
-  - `requests`
   - `playwright`
+  - `requests`
+  - `fastapi`
+  - `uvicorn[standard]`
+  - `python-multipart`
+  - `pydantic`
 - A browser runtime for Playwright (only needed for the `auth-interactive` activity).
 - TLS certificate + key at `includes/web/cert.pem` and `includes/web/key.pem`
   (only needed for the `auth-app` PKCE flow — see [Notes](#notes--tips)).
@@ -60,9 +105,9 @@ git clone <your-fork-url> AzureRedOps
 cd AzureRedOps
 
 # Create and activate a virtual environment
-python3 -m venv AzureRedOps
-source AzureRedOps/bin/activate          # Linux / macOS
-# .\AzureRedOps\Scripts\Activate.ps1     # Windows PowerShell
+python3 -m venv .venv
+source .venv/bin/activate          # Linux / macOS
+# .\.venv\Scripts\Activate.ps1     # Windows PowerShell
 
 # Install dependencies
 pip install -r requirements.txt
@@ -96,50 +141,38 @@ Activities that call Microsoft Graph need an access token. You can supply it two
 | Pass a raw token | `-ac, --access-token` | `-ac eyJ0eXAi...` |
 | Load a cached token by name | `-l, --load-access-token` | `-l mytoken` |
 
-When `-l` is used, the matching `access_token` (and, where relevant, `refresh_token`
-and `tenant`) is read from the `.azure_creds` store.
+When `-l` is used, the matching `access_token` (and, where relevant, `refresh_token` and `tenant`) is read from the `.azure_creds` store.
 
 ### Saving tokens to a file (`-s` / `-n`)
 
-Any activity that obtains tokens (`auth`, `auth-app`, `auth-interactive`,
-`phish-start`/`phish-capture`, `refresh`) can **automatically persist them** to the
-local credential store (`.azure_creds`) by adding `-s/--save` together with
-`-n/--name`:
+Any activity that obtains tokens (`auth`, `auth-app`, `auth-interactive`, `phish-start`/`phish-capture`, `refresh`) can **automatically persist them** to the local credential store (`.azure_creds`) by adding `-s/--save` together with `-n/--name`:
 
 ```bash
 # Authenticate and save the resulting tokens under the name "victim1"
 python3 AzureRedOps.py -a auth -u user@contoso.com -p 'P@ssw0rd!' -tid <tenant-guid> -s -n victim1
 ```
 
-- `-s/--save` turns on auto-save; **it requires `-n/--name`** — the tool exits with an
-  error if `-n` is missing.
-- `-n/--name` is the key the token is stored under. You can later reuse it with
-  `-l victim1` instead of pasting the raw JWT, view it with `-a view -n victim1`, or
-  delete it with `-a delete -n victim1`.
-- The `auth-interactive` activity always auto-saves and will prompt you for a name
-  interactively if `-n` is not supplied.
+- `-s/--save` turns on auto-save; **it requires `-n/--name`** — the tool exits with an error if `-n` is missing.
+- `-n/--name` is the key the token is stored under. You can later reuse it with `-l victim1` instead of pasting the raw JWT, view it with `-a view -n victim1`, or delete it with `-a delete -n victim1`.
+- The `auth-interactive` activity always auto-saves and will prompt you for a name interactively if `-n` is not supplied.
 
 ### Saving activity output to a file (`-j`)
 
-Most enumeration activities (`list-users`, `list-applications`, `list-principals`,
-`gather-all`, `raw-url`) accept `-j/--json <filename>` to write the raw API response
-to a JSON file instead of (or in addition to) printing it:
+Most enumeration activities (`list-users`, `list-applications`, `list-principals`, `gather-all`, `raw-url`) accept `-j/--json <filename>` to write the raw API response to a JSON file instead of (or in addition to) printing it:
 
 ```bash
 # Dump every user to users.json
 python3 AzureRedOps.py -a list-users -l victim1 -j users.json
 ```
 
-For `gather-all`, the supplied filename is used as a suffix and one file is written
-per Graph endpoint (e.g. `users-<name>`, `groups-<name>`, ...).
+For `gather-all`, the supplied filename is used as a suffix and one file is written per Graph endpoint (e.g. `users-<name>`, `groups-<name>`, ...).
 
-> Tip: `-j` controls structured JSON export, while `-re/--redirect-to-file` mirrors
-> the formatted console output to `output.txt`. The two are independent.
+> Tip: `-j` controls structured JSON export, while `-re/--redirect-to-file` mirrors the formatted console output to `output.txt`. The two are independent.
 
 ### Tenant identifiers
 
 - `-t, --tenant` expects a **domain name** (e.g. `contoso.com`) and is used by the `id` activity.
-- `-tid, --tenant-id` expects a **tenant GUID** or `common`, used by the authentication activities.
+- `-tid, --tenant-id` expects a **tenant GUID**, `common`, or `consumers` (v2.0 only), used by the authentication activities.
 
 ---
 
@@ -213,8 +246,8 @@ python3 AzureRedOps.py -a delete -n mytoken
 | Activity | Required | Optional | Description |
 |----------|----------|----------|-------------|
 | `id` | `-t` | — | Resolve the tenant ID for a given email domain. |
-| `phish-start` | — | `-app`, `-tid`, `-as`, `-s`, `-n` | Begin a device-code flow; prints the user code and (by default) auto-captures. |
-| `phish-capture` | `-c` | `-app`, `-tid`, `-s`, `-n` | Poll for tokens using a previously issued device code. |
+| `phish-start` | — | `-app`, `-tid`, `-as`, `-s`, `-n`, `-v` | Begin a device-code flow; prints the user code and (by default) auto-captures. |
+| `phish-capture` | `-c` | `-app`, `-tid`, `-s`, `-n`, `-v` | Poll for tokens using a previously issued device code. |
 | `auth` | `-u`, `-p`, `-tid`, `-app`, `-v` | `-s`, `-n` | Authenticate with username/password (ROPC). |
 | `auth-app` | `-tid` | `-s`, `-n` | Authorization-Code + PKCE flow via a local HTTPS listener. |
 | `auth-interactive` | — | `-url`, `-k`, `-n` | Spawn a browser (Playwright), let the user log in, and harvest tokens from the session HAR. Always auto-saves. |
@@ -242,28 +275,15 @@ python3 AzureRedOps.py -a refresh -l mytoken -app d3590ed6-52b3-4102-aeff-aad229
 
 #### How the authentication flows work
 
-AzureRedOps implements several distinct ways of obtaining tokens. Pick the one that
-matches your engagement; all of them honour `-s/-n` for auto-saving the result.
+AzureRedOps implements several distinct ways of obtaining tokens. Pick the one that matches your engagement; all of them honour `-s/-n` for auto-saving the result.
 
 ##### Device-code phishing (`phish-start` / `phish-capture`)
 
-The OAuth 2.0 **device authorization grant** is designed for input-constrained
-devices, which makes it a powerful phishing primitive: you request a code on behalf of
-a first-party Microsoft application, then socially-engineer a target into entering that
-code at `https://microsoft.com/devicelogin` while signed into their account. Once they
-do, the tokens are issued **to you**.
+The OAuth 2.0 **device authorization grant** is designed for input-constrained devices, which makes it a powerful phishing primitive: you request a code on behalf of a first-party Microsoft application, then socially-engineer a target into entering that code at `https://microsoft.com/devicelogin` while signed into their account. Once they do, the tokens are issued **to you**.
 
-- `phish-start` requests a device code and prints the **user code**, the login URL,
-  and the raw **device code**. Because `-as/--auto-start` defaults to `True`, it then
-  immediately begins polling for the token — so simply running `phish-start` and
-  handing the user code to the target is usually all you need.
-- `phish-capture` is the manual counterpart: feed it a device code you obtained earlier
-  with `-c/--devicecode` and it polls the token endpoint until the victim completes the
-  login (the tool silently retries while authorization is pending).
-- Use `-app/--appid` to impersonate a specific first-party client and `-tid/--tenant-id`
-  to scope to a tenant (`common` by default). Tip: set the scope to
-  `'https://graph.microsoft.com/.default offline_access openid'` to get a Graph-ready
-  token with a refresh token.
+- `phish-start` requests a device code and prints the **user code**, the login URL, and the raw **device code**. Because `-as/--auto-start` defaults to `True`, it then immediately begins polling for the token — so simply running `phish-start` and handing the user code to the target is usually all you need.
+- `phish-capture` is the manual counterpart: feed it a device code you obtained earlier with `-c/--devicecode` and it polls the token endpoint until the victim completes the login (the tool silently retries while authorization is pending).
+- Use `-app/--appid` to impersonate a specific first-party client and `-tid/--tenant-id` to scope to a tenant (`common` by default). Tip: set the scope to `'https://graph.microsoft.com/.default offline_access openid'` to get a Graph-ready token with a refresh token.
 
 ```bash
 # Start a device-code session (auto-captures the token once the victim logs in)
@@ -275,19 +295,11 @@ python3 AzureRedOps.py -a phish-capture -c <device-code> -tid common -s -n phish
 
 ##### Third-party application consent (`auth-app`)
 
-`auth-app` performs a full **Authorization Code flow with PKCE** against a third-party
-(non-default) application registration. The tool spins up a local **HTTPS listener**
-(`includes/Webserver.py`, on `https://localhost:2342`) that acts as the OAuth redirect
-URI, generates the PKCE `code_verifier`/`code_challenge` pair, and prints an
-authorization URL for you to open in a browser. After you consent, Azure redirects the
-authorization code back to the local listener, which the tool then exchanges for tokens.
+`auth-app` performs a full **Authorization Code flow with PKCE** against a third-party (non-default) application registration. The tool spins up a local **HTTPS listener** (`includes/WebServer.py`, on `https://localhost:2342`) that acts as the OAuth redirect URI, generates the PKCE `code_verifier`/`code_challenge` pair, and prints an authorization URL for you to open in a browser. After you consent, Azure redirects the authorization code back to the local listener, which the tool then exchanges for tokens.
 
-This is the flow to use when you control (or have registered) an application and want to
-drive consent through a real browser session — useful for illicit-consent style
-scenarios or when ROPC is blocked.
+This is the flow to use when you control (or have registered) an application and want to drive consent through a real browser session — useful for illicit-consent style scenarios or when ROPC is blocked.
 
-- Requires a TLS certificate/key pair at `includes/web/cert.pem` and
-  `includes/web/key.pem` (see [Notes](#notes--tips) for how to generate them).
+- Requires a TLS certificate/key pair at `includes/web/cert.pem` and `includes/web/key.pem` (see [Notes](#notes--tips) for how to generate them).
 - The default client ID for this flow is `8545b2fc-a69c-4851-9206-0f74a519fe5f`.
 
 ```bash
@@ -296,22 +308,11 @@ python3 AzureRedOps.py -a auth-app -tid <tenant-guid> -s -n consented
 
 ##### Interactive browser authentication (`auth-interactive`)
 
-`auth-interactive` launches a **real Chromium browser via Playwright** and lets the
-operator (or a target on a shared session) complete an interactive login — including
-MFA, Conditional Access, and federated/SSO redirects that scripted flows cannot
-satisfy. The entire browser session is recorded to a HAR file (`session.har`); the tool
-then parses that capture, extracts **every** access/refresh token pair seen on the
-`/oauth2/v2.0/token` endpoint, decodes each JWT, and lets you choose which one(s) to
-save.
+`auth-interactive` launches a **real Chromium browser via Playwright** and lets the operator (or a target on a shared session) complete an interactive login — including MFA, Conditional Access, and federated/SSO redirects that scripted flows cannot satisfy. The entire browser session is recorded to a HAR file (`session.har`); the tool then parses that capture, extracts **every** access/refresh token pair seen on the `/oauth2/v2.0/token` endpoint, decodes each JWT, and lets you choose which one(s) to save.
 
-- `-url/--url` sets the page(s) to navigate to after the login page loads. It accepts a
-  **comma-separated list** of URLs (e.g. `https://portal.azure.com,https://outlook.office.com`)
-  so you can collect tokens for multiple resources in one session. Defaults to
-  `https://portal.azure.com`.
-- This activity **always auto-saves**: after harvesting, it prompts for which token
-  index(es) to keep and a name to store them under.
-- Add `-k/--keep` to preserve `session.har` for offline analysis (it is deleted by
-  default).
+- `-url/--url` sets the page(s) to navigate to after the login page loads. It accepts a **comma-separated list** of URLs (e.g. `https://portal.azure.com,https://outlook.office.com`) so you can collect tokens for multiple resources in one session. Defaults to `https://portal.azure.com`.
+- This activity **always auto-saves**: after harvesting, it prompts for which token index(es) to keep and a name to store them under.
+- Add `-k/--keep` to preserve `session.har` for offline analysis (it is deleted by default).
 
 ```bash
 # Log in interactively and harvest tokens for two resources
@@ -370,8 +371,7 @@ python3 AzureRedOps.py -a magic-app -l mytoken
 | `spray` | `-u`, `-p`, `-tid` | `-fp`, `-cp` | Spray credentials against known first-party app IDs (v0 + v2.0 APIs). |
 | `spray-refresh` | `-v`, and (`-l`) **or** (`-r` + `-tid`) | `-fp`, `-cp` | Replay a refresh token across many app IDs. |
 
-By default both activities use `includes/auth_apps.json` as the app source; override
-with `-fp`. Add `-cp` to test whether each successful login can enumerate users/apps.
+By default both activities use `includes/auth_apps.json` as the app source; override with `-fp`. Add `-cp` to test whether each successful login can enumerate users/apps.
 
 ```bash
 # Spray a single credential across first-party apps
@@ -413,30 +413,22 @@ python3 AzureRedOps.py -a interest -i          # IDs only
 |------|-------------|
 | `includes/auth_apps.json` | Target application IDs used for spraying and the `interest` lists. |
 | `includes/apps.json` | Known Microsoft app IDs and metadata for `knownids`. |
-| `includes/Webserver.py` | Local HTTPS listener implementing the PKCE redirect for `auth-app`. |
+| `includes/WebServer.py` | Local HTTPS listener implementing the PKCE redirect for `auth-app`. |
 | `includes/web/cert.pem`, `includes/web/key.pem` | TLS material for the local listener. |
 
 ---
 
 ## Notes & Tips
 
-- **Default app ID** (`d3590ed6-52b3-4102-aeff-aad2292ab01c`) is the Microsoft Office
-  first-party client, which works for most flows. The hints printed by some activities
-  suggest extending tokens to the **Microsoft Azure CLI** app (`04b07795-8ddb-461a-bbee-02f9e1bf7b46`)
-  for broader access.
-- **Scope guidance:** use `-sc openid` for password spraying and
-  `-sc 'https://graph.microsoft.com/.default'` for Graph operations.
-- **`--beta`** switches `list-users` / `list-applications` to the Graph beta endpoint,
-  which can surface extra information (e.g. on-prem sync attributes).
-- **`auth-app` TLS:** the local PKCE listener requires a certificate/key pair at
-  `includes/web/cert.pem` and `includes/web/key.pem`. Generate a self-signed pair if
-  they are missing, e.g.:
+- **Default app ID** (`d3590ed6-52b3-4102-aeff-aad2292ab01c`) is the Microsoft Office first-party client, which works for most flows. The hints printed by some activities suggest extending tokens to the **Microsoft Azure CLI** app (`04b07795-8ddb-461a-bbee-02f9e1bf7b46`) for broader access.
+- **Scope guidance:** use `-sc openid` for password spraying and `-sc 'https://graph.microsoft.com/.default'` for Graph operations.
+- **`--beta`** switches `list-users` / `list-applications` to the Graph beta endpoint, which can surface extra information (e.g. on-prem sync attributes).
+- **`auth-app` TLS:** the local PKCE listener requires a certificate/key pair at `includes/web/cert.pem` and `includes/web/key.pem`. Generate a self-signed pair if they are missing, e.g.:
   ```bash
   openssl req -x509 -newkey rsa:2048 -nodes \
     -keyout includes/web/key.pem -out includes/web/cert.pem -days 365 -subj "/CN=localhost"
   ```
-- **Debugging:** `-d` prints high-level debug info; `-dd` dumps full HTTP requests and
-  responses (headers + bodies) — useful when diagnosing failed token exchanges.
+- **Debugging:** `-d` prints high-level debug info; `-dd` dumps full HTTP requests and responses (headers + bodies) — useful when diagnosing failed token exchanges.
 
 ---
 
